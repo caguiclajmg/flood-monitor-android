@@ -22,6 +22,12 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "packagerOpts": {
+      "assetExts": [
+        "html",
+        "js"
+      ]
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "me.caguicla.floodmonitor"
