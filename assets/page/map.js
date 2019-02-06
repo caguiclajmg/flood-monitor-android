@@ -1,6 +1,7 @@
 class Application {
     constructor(element) {
         var platform = new H.service.Platform({
+            /* ¯\_(ツ)_/¯ */
             app_id: 'glc84RI61vvZ5tT7nqHC',
             app_code: 'qV7SBpyMBmVR4YDjSa5aGg',
             useCIT: true,
