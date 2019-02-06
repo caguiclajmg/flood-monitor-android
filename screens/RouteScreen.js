@@ -4,6 +4,7 @@ import {
     WebView,
 } from 'react-native';
 import { Permissions, Location } from 'expo';
+import ExpoConfigView from '@expo/samples/ExpoConfigView';
 
 export default class RouteScreen extends React.Component {
     static navigationOptions = {
