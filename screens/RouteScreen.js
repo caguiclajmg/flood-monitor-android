@@ -32,9 +32,6 @@ export default class RouteScreen extends React.Component {
         return (
             <WebView
                 source={{uri: Expo.Asset.fromModule(require('../assets/page/map.html')).uri}}
-                domStorageEnabled={true}
-                javaScriptEnabled={true}
-                geolocationEnabled={true}
                 ref={this.webviewMap}
                 style={styles.webview}
             />
