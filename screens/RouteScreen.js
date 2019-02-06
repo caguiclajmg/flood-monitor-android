@@ -4,7 +4,6 @@ import {
     WebView,
 } from 'react-native';
 import { Permissions, Location } from 'expo';
-import ExpoConfigView from '@expo/samples/ExpoConfigView';
 
 export default class RouteScreen extends React.Component {
     static navigationOptions = {
@@ -36,6 +35,8 @@ export default class RouteScreen extends React.Component {
             <WebView
                 source={{uri: Expo.Asset.fromModule(require('../assets/page/map.html')).uri}}
                 ref={this.webviewMap}
+                mixedContentMode={'always'}
+                allowUniversalAccessFromFileURLs={true}
                 style={styles.webview}
             />
         );
