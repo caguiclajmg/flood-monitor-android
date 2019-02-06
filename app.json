@@ -23,7 +23,11 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "me.caguicla.floodmonitor"
+    },
+    "android": {
+      "package": "me.caguicla.floodmonitor"
     }
   }
 }
