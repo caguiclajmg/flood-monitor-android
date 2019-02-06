@@ -20,6 +20,8 @@ export default class RouteScreen extends React.Component {
         Permissions.askAsync(Permissions.LOCATION).then(() => {
             Location.watchPositionAsync({
                 accuracy: Location.Accuracy.BestForNavigation,
+                timeInterval: 2000,
+                distanceInterval: 5,
             }, loc => {
                 this.webviewMap.current.postMessage(JSON.stringify(loc));
             });
