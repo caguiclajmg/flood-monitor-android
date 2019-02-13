@@ -53,7 +53,7 @@ export default class StatusScreen extends React.Component {
         this.setState({refreshing: true});
 
         try {
-            const response = await fetch('https://flood-monitor.herokuapp.com/api/station');
+            const response = await fetch('https://flood-monitor.herokuapp.com/api/mobile/status');
             const stations = await response.json();
 
             this.state.stations = stations;
@@ -80,7 +80,7 @@ export default class StatusScreen extends React.Component {
                     </View>
                     <View style={styles.property}>
                         <Text style={styles.propertyLabel}>Level</Text>
-                        <Text style={styles.propertyValue}>{(Math.random() * 10).toFixed(2)}m</Text>
+                        <Text style={styles.propertyValue}>{station.level}ft</Text>
                     </View>
                 </View>
             </View>

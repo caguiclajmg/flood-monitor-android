@@ -3,11 +3,11 @@ import {
     StyleSheet,
     WebView,
 } from 'react-native';
-import { Permissions, Location } from 'expo';
+import { Location, Permissions } from 'expo';
 
-export default class RouteScreen extends React.Component {
+export default class MapScreen extends React.Component {
     static navigationOptions = {
-        title: 'Route',
+        title: 'Map',
     };
 
     constructor(props) {
@@ -22,11 +22,11 @@ export default class RouteScreen extends React.Component {
                 accuracy: Location.Accuracy.BestForNavigation,
                 timeInterval: 2000,
                 distanceInterval: 5,
-            }, loc => {
+            }, (loc) => {
                 this.webviewMap.current.postMessage(JSON.stringify(loc));
             });
-        }).catch(reason => {
-            console.log(reason);
+        }).catch(() => {
+
         });
     }
 
@@ -37,7 +37,10 @@ export default class RouteScreen extends React.Component {
                 ref={this.webviewMap}
                 mixedContentMode={'always'}
                 allowUniversalAccessFromFileURLs={true}
+                javaScriptEnabled={true}
+                geolocationEnabled={true}
                 style={styles.webview}
+                onLoad={this.webviewLoad}
             />
         );
     }
