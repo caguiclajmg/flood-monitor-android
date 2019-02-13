@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "flood-monitor-android",
+    "name": "Flood Monitor",
     "slug": "flood-monitor-android",
     "privacy": "public",
     "sdkVersion": "32.0.0",
@@ -17,7 +17,7 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 10000
     },
     "assetBundlePatterns": [
       "**/*"
