@@ -38,7 +38,6 @@ export default class MapScreen extends React.Component {
                 javaScriptEnabled={true}
                 geolocationEnabled={true}
                 style={styles.webview}
-                onLoad={this.webviewLoad}
             />
         );
     }
