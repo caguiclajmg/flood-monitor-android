@@ -6,9 +6,10 @@
 
         <title>Map</title>
 
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <style>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+        <style type="text/css">
             body {
                 width: 100vw;
                 height: 100vh;
@@ -18,36 +19,487 @@
                 border-radius: 100%;
             }
 
-            .toolbar {
+            #map-controls {
                 position: absolute;
-                top: 0;
                 left: 0;
+                top: 0;
 
                 margin-left: 1rem;
                 margin-top: 1rem;
             }
+
+            #table-status {
+                font-size: 0.75em;
+            }
         </style>
-    </head>
-    <body>
-        <div style="width: 100%; height: 100%;">
-            <div style="width: 100%; height:100%;" id="divMap"></div>
-            <div class="toolbar">
-                <button type="button" class="btn btn-secondary btn-circle" onclick="app.center()">
-                    <i class="material-icons">my_location</i>
-                </button>
-                <button type="button" class="btn btn-secondary btn-circle">
-                    <i class="material-icons">search</i>
-                </button>
-                <button type="button" class="btn btn-secondary btn-circle">
-                    <i class="material-icons">settings</i>
-                </button>
-            </div>
-        </div>
 
         <script src="https://js.api.here.com/v3/3.0/mapsjs-core.js" type="text/javascript" charset="utf-8"></script>
         <script src="https://js.api.here.com/v3/3.0/mapsjs-service.js" type="text/javascript" charset="utf-8"></script>
         <script src="https://js.api.here.com/v3/3.0/mapsjs-mapevents.js" type="text/javascript" charset="utf-8"></script>
+        <script src="https://unpkg.com/moment@2.24.0/min/moment.min.js" charset="utf-8"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="map.js" type="text/javascript" charset="utf-8"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div class="w-100 h-100">
+            <div id="map" class="w-100 h-100"></div>
+            <div id="map-controls">
+                <button id="map-controls-center" class="btn btn-light btn-circle shadow-sm mb-5"><i class="material-icons">my_location</i></button>
+                <button id="map-controls-search" class="btn btn-light btn-circle shadow-sm mb-5" data-toggle="modal" data-target="#modal-route"><i class="material-icons">location_on</i></button>
+                <button id="map-controls-status" class="btn btn-light btn-circle shadow-sm mb-5" data-toggle="modal" data-target="#modal-status"><i class="material-icons">waves</i></button>
+                <button id="map-controls-settings" class="btn btn-light btn-circle shadow-sm mb-5" data-toggle="modal" data-target="#modal-settings"><i class="material-icons">settings</i></button>
+            </div>
+        </div>
+
+        <!-- Route Modal -->
+        <div class="modal fade" id="modal-route" tabindex="-1">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Route</h3>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <h5>Search</h5>
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <button type="button" id="button-route-frommap" class="btn btn-sm btn-outline-secondary" data-dismiss="modal"><i class="material-icons">pin_drop</i></button>
+                                <button type="button" id="button-route-clear" class="btn btn-sm btn-outline-secondary" data-dismiss="modal"><i class="material-icons">remove_circle</i></button>
+                            </div>
+                            <input type="text" class="form-control" id="input-route-search" placeholder="Enter an address or an establishment" />
+                            <div class="input-group-append">
+                                <button type="button" id="button-route-search" class="btn btn-sm btn-outline-secondary"><i class="material-icons">search</i></button>
+                            </div>
+                        </div>
+                        <div class="pre-scrollable">
+                            <table id="table-route-results" class="table table-sm table-striped table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Modal -->
+        <div class="modal fade" id="modal-status" tabindex="-1">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Status</h3>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <table id="table-status" class="table table-sm table-bordered table-striped text-center">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Station</th>
+                                    <th scope="col">Last Update</th>
+                                    <th scope="col">Level</th>
+                                    <th scope="col">Passability</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5">No data available</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="modal fade" id="modal-settings" tabindex="-1">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Settings</h3>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <h5>Vehicle Type</h5>
+                            <select class="form-control" id="select-vehicle-type">
+                                <option value="0.15">Sedan</option>
+                                <option value="0.17">SUV</option>
+                            </select>
+                        </div>
+                        <div>
+                            <h5>Stations</h5>
+                            <table class="table table-sm table-bordered table-striped text-center" id="table-settings-stations">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Visible</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="2">No data available</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="button-settings-save" data-dismiss="modal">Save</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="application/javascript" charset="utf-8">
+            const API_BASE_URI = 'https://flood-monitor.herokuapp.com/api';
+            const STATUS_UPDATE_INTERVAL = 5000;
+            const HERE_APP_ID = 'NL0ChHSuGAX2gNnaLDrq';
+            const HERE_APP_CODE = 'YWo3h6Ly7StPDYq-a8LnTg';
+            const OPENCAGEDATA_KEY = 'dab6b35c196b4b71be6c3eab52461a60';
+            const PALETTE = [
+                "#e53935",
+                "#d81b60",
+                "#8e24aa",
+                "#5e35b1",
+                "#3949ab",
+                "#1e88e5",
+                "#039be5",
+                "#00acc1",
+                "#00897b",
+                "#43a047",
+                "#7cb342",
+                "#c0ca33",
+                "#fdd835",
+                "#ffb300",
+                "#fb8c00",
+                "#f4511e",
+                "#6d4c41",
+                "#757575",
+                "#546e7a"
+            ];
+
+            let platform = new H.service.Platform({
+                app_id: HERE_APP_ID,
+                app_code: HERE_APP_CODE
+            });
+
+            let geocoder = platform.getGeocodingService();
+            let router = platform.getRoutingService();
+
+            let layers = platform.createDefaultLayers();
+            let map, behavior;
+
+            let origin, originMarker;
+            let destination, destinationMarker;
+
+            let status;
+
+            let stationMarkers = [];
+            let stationPolylines = [];
+            let stationVisible = [];
+            let vehicleGroundClearance = 0.15;
+
+            $(document).ready(() => {
+                let element = $('#map')[0];
+
+                map = new H.Map(element, layers.normal.map);
+                behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+                $(window).resize(() => { if(map) map.getViewPort().resize() });
+
+                $(document).on('message', (e) => {
+                    const message = JSON.parse(e.originalEvent.data) || {};
+
+                    if(message.origin) onOriginUpdate(message.origin);
+                });
+
+                $('#map-controls-center').click(() => {
+                    if(!map || !origin) return;
+
+                    map.setCenter(origin, true);
+                    map.setZoom(17, true);
+                });
+
+                // Modal events
+                $('#modal-route').on('show.bs.modal', onRouteModalShow);
+                $('#modal-route').on('shown.bs.modal', onRouteModalShown);
+                $('#modal-route').on('hidden.bs.modal', onRouteModalHidden);
+                $('#button-route-frommap').click(() => map.addEventListener('tap', routeModalPick));
+                $('#button-route-clear').click(() => updateDestination(null));
+                $('#button-route-search').click(() => routeModalSearch($('#input-route-search').val()));
+
+                $('#modal-status').on('show.bs.modal', onStatusModalShow);
+
+                $('#modal-settings').on('show.bs.modal', onSettingsModalShow);
+                $('#button-settings-save').click(() => {
+                    vehicleGroundClearance = parseFloat($('#select-vehicle-type').val());
+
+                    if(status) {
+                        $('#table-settings-stations > tbody > tr input').each((index, elem) => {
+                            const station = parseInt($(elem).val())
+                            stationVisible[station] = $(elem).prop('checked');
+                            updateRoutes();
+                        });
+                    }
+                });
+
+                try {
+                    navigator.geolocation.watchPosition(onOriginUpdate);
+                } catch(e) {
+
+                }
+
+                updateStatus();
+            });
+
+            function onOriginUpdate(pos) {
+                const now = Date.now();
+
+                updateOrigin({
+                    lat: pos.coords.latitude,
+                    lng: pos.coords.longitude
+                });
+
+                last = now;
+            }
+
+            function routeModalPick(e) {
+                const coord = map.screenToGeo(e.currentPointer.viewportX, e.currentPointer.viewportY);
+                updateDestination(coord);
+                map.removeEventListener('tap', routeModalPick);
+            }
+
+            function routeModalSearch(q) {
+                fetch(`https://api.opencagedata.com/geocode/v1/json?key=${OPENCAGEDATA_KEY}&q=${q}`).then((res) => {
+                    res.json().then((res) => {
+                        const body = $('#table-route-results > tbody');
+                        body.empty();
+
+                        if(res.results && res.results.length) {
+                            res.results.forEach((result) => {
+                                const row = $(`
+                                    <tr style="cursor: default" data-dismiss="modal">
+                                        <td>${result.formatted}</td>
+                                    </tr>
+                                `);
+                                row.click((e) => {
+                                    updateDestination(result.geometry);
+                                    if(origin && destination) map.setViewBounds(H.geo.Rect.coverPoints([origin, destination]), true);
+                                });
+                                body.append(row);
+                            });
+                        } else {
+                            body.append($('<tr><td>No results found</td></tr>'));
+                        }
+                    });
+                });
+            }
+
+            function onRouteModalShow() {
+
+            }
+
+            function onRouteModalShown() {
+                $('#input-route-search').focus();
+            }
+
+            function onRouteModalHidden() {
+                $('#table-route-results > tbody').empty();
+                $('#input-route-search').val('');
+            }
+
+            function onStatusModalShow() {
+                if(!status) return;
+
+                const tableBody = $('#table-status > tbody');
+                tableBody.empty();
+
+                status.forEach((entry) => {
+                    const level = entry.level || vehicleGroundClearance;
+                    const passability = vehicleGroundClearance / level;
+                    let color, message;
+
+                    if(passability < 0.25) {
+                        color = '#b91400';
+                        message = "Danger";
+                    } else if(passability >= 0.25 && passability <= 0.75) {
+                        color = '#fff176';
+                        message = "Warning";
+                    } else {
+                        color = '#7cb342';
+                        message = "Good";
+                    }
+
+                    tableBody.append($(`
+                        <tr>
+                            <th scope="row">${entry.station}</th>
+                            <td>${entry.name}</td>
+                            <td>${moment(entry.timestamp).format('DD/MM/YY hh:mm')}</td>
+                            <td>${entry.level}m</td>
+                            <td style="background-color: ${color}; color: #fff">${message}</td>
+                        </tr>
+                    `));
+                });
+            }
+
+            function onSettingsModalShow() {
+                $('#select-vehicle-type').val(vehicleGroundClearance.toString());
+
+                if(!status) return;
+
+                const body = $('#table-settings-stations > tbody');
+                body.empty();
+
+                status.forEach((entry) => {
+                    const checkbox = $(`<input type="checkbox" class="d-none" value="${entry.station}" ${stationVisible[entry.station] ? 'checked ' : ''}/>`)
+                    const checkboxIcon = $(`<i class="material-icons">${stationVisible[entry.station] ? 'visibility' : 'visibility_off'}</i>`);
+                    checkboxIcon.click(() => {
+                        checkbox.prop('checked', !checkbox.prop('checked'))
+                        checkboxIcon.html(checkbox.prop('checked') ? 'visibility' : 'visibility_off');
+                    });
+                    const row = $(`
+                        <tr style="cursor: default">
+                            <td>${entry.name}</td>
+                        </tr>
+                    `);
+                    row.append($('<td></td>').append(checkbox, checkboxIcon));
+                    body.append(row);
+                });
+            }
+
+            function updateStations() {
+                if(!status) return;
+
+                stationMarkers.forEach((marker) => {
+                    map.removeObject(marker);
+                });
+                stationMarkers.length = 0;
+
+                stationPolylines.forEach((polyline) => {
+                    map.removeObject(polyline);
+                });
+                stationPolylines.length = 0;
+
+                status.forEach((entry, index) => {
+                    const color = PALETTE[parseInt(entry.station)];
+
+                    const svg =
+                        '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg">' +
+                            '<g>' +
+                                '<circle fill="' + color + '" cx="12" cy="12" r="12" />' +
+                                '<text x="50%" y="65%" text-anchor="middle" font-weight="bold" fill="white">' + entry.station + '</text>' +
+                            '</g>' +
+                        '</svg>';
+
+                    const marker = new H.map.Marker({
+                        lat: entry.latitude,
+                        lng: entry.longitude
+                    }, {
+                        icon: new H.map.Icon(svg),
+                        visibility: stationVisible[parseInt(entry.station)]
+                    });
+                    stationMarkers.push(marker);
+                    map.addObject(marker);
+
+                    if(origin && destination) {
+                        router.calculateRoute({
+                            mode: 'fastest;car',
+                            waypoint0: `geo!${origin.lat},${origin.lng}`,
+                            waypoint1: `geo!${entry.latitude},${entry.longitude}`,
+                            waypoint2: `geo!${destination.lat},${destination.lng}`,
+                            representation: 'display'
+                        }, (result) => {
+                            if(!result.response.route) return;
+
+                            const route = result.response.route[0];
+                            const shape = route.shape;
+
+                            const lineString = new H.geo.LineString();
+                            shape.forEach((pnt) => {
+                                const [lat, lng] = pnt.split(',');
+                                lineString.pushLatLngAlt(lat, lng);
+                            });
+
+                            const polyline = new H.map.Polyline(lineString, {
+                                style: {
+                                    strokeColor: color,
+                                    lineWidth: 5,
+                                },
+                                visibility: stationVisible[parseInt(entry.station)]
+                            });
+
+                            stationPolylines.push(polyline);
+                            map.addObject(polyline);
+                        }, (err) => {
+                            console.error(err);
+                        });
+                    }
+                });
+            }
+
+            function updateRoutes() {
+                updateStations();
+            }
+
+            function updateStatus() {
+                fetch(`${API_BASE_URI}/mobile/status`).then((res) => {
+                    res.json().then((res) => {
+                        status = res;
+                        onStatusModalShow();
+                    });
+                    setTimeout(updateStatus, STATUS_UPDATE_INTERVAL);
+                }).catch((reason) => {
+                    setTimeout(updateStatus, STATUS_UPDATE_INTERVAL);
+                });
+            }
+
+            function updateOrigin(loc) {
+                origin = loc;
+
+                if(origin) {
+                    if(originMarker) {
+                        originMarker.setPosition(origin);
+                    } else {
+                        originMarker = new H.map.Marker(origin);
+                        map.addObject(originMarker);
+                    }
+                } else {
+                    if(originMarker) {
+                        map.removeObject(originMarker);
+                        originMarker = null;
+                    }
+                }
+
+                updateRoutes();
+            }
+
+            function updateDestination(loc, center) {
+                destination = loc;
+
+                if(destination) {
+                    if(destinationMarker) {
+                        destinationMarker.setPosition(destination);
+                    } else {
+                        destinationMarker = new H.map.Marker(destination);
+                        map.addObject(destinationMarker);
+                    }
+                } else {
+                    if(destinationMarker) {
+                        map.removeObject(destinationMarker);
+                        destinationMarker = null;
+                    }
+                }
+
+                updateRoutes();
+            }
+        </script>
     </body>
 </html>
