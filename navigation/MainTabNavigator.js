@@ -5,6 +5,7 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
 import TabBarIcon from '../components/TabBarIcon';
 import StatusScreen from '../screens/StatusScreen';
 import MapScreen from '../screens/MapScreen';
+import LogScreen from '../screens/LogScreen';
 
 const StatusStack = createStackNavigator({
     Status: StatusScreen,
@@ -38,7 +39,22 @@ MapStack.navigationOptions = {
     ),
 };
 
+const LogStack = createStackNavigator({
+    Log: LogScreen,
+});
+
+LogStack.navigationOptions = {
+    tabBarLabel: 'Log',
+    tabBarIcon: ({ focused }) => (
+        <TabBarIcon
+            focused={focused}
+            name={Platform.OS === 'ios' ? 'ios-menu' : 'md-menu'}
+        />
+    ),
+};
+
 export default createBottomTabNavigator({
     StatusStack,
-    MapStack
+    MapStack,
+    LogStack
 });
