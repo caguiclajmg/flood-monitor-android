@@ -7,7 +7,6 @@ import {
     View,
     RefreshControl,
 } from 'react-native';
-import Touchable from 'react-native-platform-touchable';
 
 export default class StatusScreen extends React.Component {
     static navigationOptions = {
@@ -42,7 +41,7 @@ export default class StatusScreen extends React.Component {
                         />
                     }
                     dataSource={this.state.dataSource}
-                    renderRow={(station) => this._renderRow(station)}
+                    renderRow={this._renderRow}
                     enableEmptySections={true}
                 />
             </View>
@@ -61,13 +60,13 @@ export default class StatusScreen extends React.Component {
         } finally {
             this.setState({refreshing: false});
         }
-    }
+    };
 
     _renderRow(station) {
         return (
             <View style={styles.station}>
                 <View style={styles.imageContainer}>
-                    <Text>{station.id}</Text>
+                    <Text>{station.station}</Text>
                 </View>
                 <View style={styles.infoContainer}>
                     <View style={styles.property}>
@@ -80,12 +79,12 @@ export default class StatusScreen extends React.Component {
                     </View>
                     <View style={styles.property}>
                         <Text style={styles.propertyLabel}>Level</Text>
-                        <Text style={styles.propertyValue}>{station.level}ft</Text>
+                        <Text style={styles.propertyValue}>{(station.level * 0.3048).toFixed(4)}m</Text>
                     </View>
                 </View>
             </View>
         );
-    }
+    };
 }
 
 const styles = StyleSheet.create({
