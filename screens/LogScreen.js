@@ -47,7 +47,8 @@ export default class LogScreen extends React.Component {
         const json = await response.json();
 
         this.setState({
-            stations: json
+            stations: json,
+            selectedStation: json[0].id
         });
     }
 
@@ -97,6 +98,8 @@ export default class LogScreen extends React.Component {
     }
 
     _addEntry = async () => {
+        if(!this.state.selectedStation || isNaN(this.state.levelInput)) return;
+
         const data = {
             station: this.state.selectedStation,
             level: parseFloat(this.state.levelInput) * 3.28084
@@ -110,7 +113,7 @@ export default class LogScreen extends React.Component {
             body: JSON.stringify(data)
         });
         const json = await response.json();
-        console.log(json[0]);
+
         this._setLogData([...this.state.log, json[0]]);
     }
 
