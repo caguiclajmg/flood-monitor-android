@@ -1,12 +1,16 @@
 import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
-import { AppLoading, Asset, Font, Icon } from 'expo';
+import { AppLoading, Asset, Font, Icon, Notifications } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
 
 export default class App extends React.Component {
     state = {
         isLoadingComplete: false,
     };
+
+    componentDidMount() {
+        this._checkWaterLevel();
+    }
 
     render() {
         if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
@@ -52,6 +56,28 @@ export default class App extends React.Component {
     _handleFinishLoading = () => {
         this.setState({ isLoadingComplete: true });
     };
+
+    _checkWaterLevel = async () => {
+        try {
+            const response = await fetch('https://flood-monitor.herokuapp.com/api/mobile/status');
+            if(response.status !== 200) throw new Error('Invalid response from server');
+
+            const json = await response.json();
+
+            json.forEach((station) => {
+                station.level *= 0.3048;
+
+                if(station.level > 0.9144) {
+                    Notifications.presentLocalNotificationAsync({
+                        title: 'Flood Warning',
+                        body: `Water level at ${station.name} is now ${station.level}m`
+                    });
+                }
+            });
+        } finally {
+            setTimeout(this._checkWaterLevel, 30 * 1000);
+        }
+    }
 }
 
 const styles = StyleSheet.create({
