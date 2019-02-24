@@ -129,8 +129,9 @@
                         <div>
                             <h5>Vehicle Type</h5>
                             <select class="form-control" id="select-vehicle-type">
-                                <option value="0.15">Sedan</option>
-                                <option value="0.17">SUV</option>
+                                <option value="0.25">Sedan</option>
+                                <option value="0.45">SUV</option>
+                                <option value="0.75">Others</option>
                             </select>
                         </div>
                         <div>
@@ -205,7 +206,7 @@
             let stationMarkers = [];
             let stationPolylines = [];
             let stationVisible = [];
-            let vehicleGroundClearance = 0.15;
+            let vehicleGroundClearance = 0.25;
 
             $(document).ready(() => {
                 let element = $('#map')[0];
