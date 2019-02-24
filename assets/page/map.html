@@ -323,8 +323,8 @@
                 tableBody.empty();
 
                 status.forEach((entry) => {
-                    const level = entry.level || vehicleGroundClearance;
-                    const passability = vehicleGroundClearance / level;
+                    const level = (entry.level || vehicleGroundClearance) * 0.3048; // ft to m
+                    const passability = 1 - Math.min(level / vehicleGroundClearance, 1);
                     let color, message;
 
                     if(passability < 0.25) {
@@ -343,7 +343,7 @@
                             <th scope="row">${entry.station}</th>
                             <td>${entry.name}</td>
                             <td>${moment(entry.timestamp).format('DD/MM/YY hh:mm')}</td>
-                            <td>${entry.level}m</td>
+                            <td>${level.toFixed(4)}m</td>
                             <td style="background-color: ${color}; color: #fff">${message}</td>
                         </tr>
                     `));
