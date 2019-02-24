@@ -6,6 +6,7 @@ import TabBarIcon from '../components/TabBarIcon';
 import StatusScreen from '../screens/StatusScreen';
 import MapScreen from '../screens/MapScreen';
 import LogScreen from '../screens/LogScreen';
+import StationsScreen from '../screens/StationsScreen';
 
 const StatusStack = createStackNavigator({
     Status: StatusScreen,
@@ -16,11 +17,7 @@ StatusStack.navigationOptions = {
     tabBarIcon: ({ focused }) => (
         <TabBarIcon
             focused={focused}
-            name={
-                Platform.OS === 'ios'
-                    ? `ios-information-circle${focused ? '' : '-outline'}`
-                    : 'md-stats'
-            }
+            name={Platform.OS === 'ios' ? 'ios-pulse' : 'md-pulse'}
         />
     ),
 };
@@ -48,12 +45,27 @@ LogStack.navigationOptions = {
     tabBarIcon: ({ focused }) => (
         <TabBarIcon
             focused={focused}
-            name={Platform.OS === 'ios' ? 'ios-menu' : 'md-menu'}
+            name={Platform.OS === 'ios' ? 'ios-analytics' : 'md-analytics'}
+        />
+    ),
+};
+
+const StationsStack = createStackNavigator({
+    Stations: StationsScreen,
+});
+
+StationsStack.navigationOptions = {
+    tabBarLabel: 'Stations',
+    tabBarIcon: ({ focused }) => (
+        <TabBarIcon
+            focused={focused}
+            name={Platform.OS === 'ios' ? 'ios-globe' : 'md-globe'}
         />
     ),
 };
 
 export default createBottomTabNavigator({
+    StationsStack,
     StatusStack,
     MapStack,
     LogStack
